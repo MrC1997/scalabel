@@ -5,6 +5,9 @@
         - name: 000
         - name: 001
         - name: 002
+          subcategories:
+              -name: 0000
+              -name: 0001
     - name: 01
       subcategories:
         - name: 010

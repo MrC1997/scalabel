@@ -148,7 +148,9 @@ SatImage.prototype.deleteLabel = function(label) {
 };
 
 SatImage.prototype._selectLabel = function(label) {
+  let self = this;
   if (this.selectedLabel) {
+    document.getElementById('trim-btn').disabled = true;
     this.selectedLabel.releaseAsTargeted();
     this._deselectAll();
   }
@@ -170,12 +172,38 @@ SatImage.prototype._selectLabel = function(label) {
         this._selectAttributeFromList(i, selectedIndex);
       }
     }
+    document.getElementById('trim-btn').disabled = false;
+    document.getElementById('trim-btn').onclick = function() {
+      self._trimHandler();
+    };
+    this.upadateToolbox(this.selectedLabel);
     this._setCatSel(this.selectedLabel.categoryPath);
     this.redrawLabelCanvas();
     this.redrawHiddenCanvas();
   }
 };
-
+SatImage.prototype.upadateToolbox = function(label){
+  let category_absPath = [];
+  let table = this.sat.table;
+  for(let i = 0; i<table.length;i++){
+    if(table[i][0] == label.categoryPath){
+      category_absPath = table[i].concat();
+      this.findCategoryIndex(this.sat.categories,category_absPath.reverse(),0);
+      break;
+    }
+  }
+};
+SatImage.prototype.findCategoryIndex = function(categories,categoryName,level){
+  for(let i = 0;i<categories.length;i++){
+    if(categoryName[0] == categories[i].name){
+      this.sat.appendCascadeCategories(categories,level,i);
+      categoryName.shift();
+      if(categories[i].subcategories)
+        this.findCategoryIndex(categories[i].subcategories,categoryName,level+1);
+      break;
+    }
+  }
+};
 SatImage.prototype.selectLabel = function(label) {
   // if the label has a parent, select all labels along the track
   if (label.parent) {
@@ -467,7 +495,6 @@ SatImage.prototype.setActive = function(active) {
         self._trackLinkHandler();
       };
     }
-
     // toolbox
     self.sat.appendCascadeCategories(self.sat.categories, 0);
     self.catSel = document.getElementById('category_select');
@@ -566,7 +593,22 @@ SatImage.prototype._getSelectedAttributes = function() {
   }
   return attributes;
 };
-
+/**
+ *Trim button handle
+ */
+SatImage.prototype._trimHandler = function() {
+  let self = this;
+  if(self.selectedLabel){
+    let trimRatio = document.getElementById('trim-off=ratio').value;
+    let label = self.selectedLabel;
+    let h = label.h*(1-trimRatio/100);
+    let w = label.w*(1-trimRatio/100);
+    let x = label.x+w*trimRatio/200;
+    let y = label.y+h*trimRatio/200;
+    label.rect.setRect(x,y,w,h);
+    self.redrawLabelCanvas();
+  }
+};
 /**
  * Prev button handler
  */
@@ -1548,10 +1590,22 @@ ImageLabel.prototype.drawTag = function(ctx, position) {
   let self = this;
   if (self.shapesValid()) {
     ctx.save();
-    let words = self.categoryPath.split(' ');
     let tw = self.TAG_WIDTH;
+    let abbr = "";
+    for(let key in self.sat.table){
+      if(self.categoryPath==self.sat.table[key][0]){
+        let absPath = self.sat.table[key];
+        for(let i in absPath){
+          if(self.sat.categoriesVisualSelect[absPath[i]])
+            abbr = abbr +'.'+ absPath[i];
+        }
+        break;
+      }
+    }
+    let words = self.categoryPath.split(' ');
     // abbreviate tag as the first 3 chars of the last word
-    let abbr = words[words.length - 1].substring(0, 3);
+    abbr = words[words.length - 1].substring(0, 3)+abbr;
+    tw = abbr.length*7+10;
     for (let i = 0; i < self.sat.attributes.length; i++) {
       let attribute = self.sat.attributes[i];
       if (attribute.toolType === 'switch') {

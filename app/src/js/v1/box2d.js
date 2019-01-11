@@ -25,15 +25,15 @@ export function Box2d(sat, id, optionalAttributes) {
 
   // attributes
   let mousePos;
-  if (optionalAttributes) {
+  if(optionalAttributes){
     this.categoryPath = optionalAttributes.categoryPath;
-    for (let i = 0; i < this.sat.attributes.length; i++) {
-      let attributeName = this.sat.attributes[i].name;
-      if (attributeName in optionalAttributes.attributes) {
-        this.attributes[attributeName] =
-            optionalAttributes.attributes[attributeName];
+      for(let i = 0;i<this.sat.attributes.length;i++){
+        let attributeName = this.sat.attributes[i].name;
+        if (attributeName in optionalAttributes.attributes){
+          this.attributes[attributeName]=
+                optionalAttributes.attributes[attributeName];
+        }
       }
-    }
     mousePos = optionalAttributes.mousePos;
     if (mousePos) {
       this.rect.setRect(mousePos.x,

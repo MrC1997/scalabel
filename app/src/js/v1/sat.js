@@ -78,6 +78,9 @@ export function Sat(ItemType, LabelType, hasNetwork=true) {
   self.ItemType = ItemType;
   self.LabelType = LabelType;
   self.events = [];
+  self.table = [];
+  self.table[0] = [];
+  self.categoriesVisualSelect = [];
   self.startTime = Date.now();
   self.taskId = null;
   self.projectName = null;
@@ -90,6 +93,7 @@ export function Sat(ItemType, LabelType, hasNetwork=true) {
   }
   if (hasNetwork) {
     self.load();
+    self.solvetree(self.categories,[],0);
     self.getIpInfo();
   }
   self.state = makeState();
@@ -218,6 +222,23 @@ Sat.prototype.loaded = function() {
   this.currentItem.setActive(true);
 };
 
+Sat.prototype.solvetree = function(subcategories,fatherName,bidx){  //node ,this node`s name ,the number of bidx
+  let self = this;
+  for(let key in subcategories){ //traverse this level 
+    if(!subcategories[key].subcategories) { //if next level not exists 
+      self.table[bidx] = fatherName.concat();
+      self.table[bidx].unshift(subcategories[key].name);//push a child name
+      self.table.push([]);
+      bidx++;
+    }else {
+      self.categoriesVisualSelect [subcategories[key].name] = false;  //build a categories display selector
+      fatherName.unshift(subcategories[key].name);
+      bidx = this.solvetree(subcategories[key].subcategories,fatherName,bidx);
+      fatherName.shift();
+    }
+  }
+  return bidx;
+};
 /**
  * Load this SAT from the back end.
  */
@@ -257,6 +278,7 @@ Sat.prototype.appendCascadeCategories = function(
   let previousChildLevel = level;
   while (document.getElementById('parent_select_' + previousChildLevel)) {
     $('#parent_select_' + previousChildLevel).next().remove();
+    $('#parent_select_' + previousChildLevel).next().remove();
     document.getElementById('parent_select_' + previousChildLevel).remove();
     previousChildLevel++;
   }
@@ -268,6 +290,8 @@ Sat.prototype.appendCascadeCategories = function(
   let categoryDiv = document.getElementById('custom_categories');
   // build new category select window
   let child;
+  //build new category visual selector checkbox
+  let cb;
   // if there is subcategory, this node is parent node, grow tree
   if (subcategories[selectedIdx].subcategories) {
     child = document.createElement('select');
@@ -275,11 +299,17 @@ Sat.prototype.appendCascadeCategories = function(
     child.classList.add('form-control');
     child.size = Math.min(10, subcategories.length);
     child.style = 'font-size:15px';
+    cb = document.createElement('input');
+    cb.id = "parent_visual_select_"+level;
+    cb.type = 'checkbox';
+    cb.checked = this.categoriesVisualSelect[subcategories[selectedIdx].name];
+    cb.name = "checkbox";
   } else {
     // this node is leaf, clean up old options
     let oldCategorySelect = document.getElementById('category_select');
     if (oldCategorySelect) {
       oldCategorySelect.innerHTML = '';
+      $('#category_select').next().remove();
       $('#category_select').next().remove();
       child = oldCategorySelect;
     } else {
@@ -288,6 +318,12 @@ Sat.prototype.appendCascadeCategories = function(
       child.classList.add('form-control');
       child.style = 'font-size:15px';
     }
+    cb = document.createElement('input');
+    cb.id = "category_visual_select";
+    cb.type = 'checkbox';
+    cb.checked = true;
+    cb.disabled = true;
+    cb.class = 'checkbox';
     child.size = Math.min(10, subcategories.length);
   }
   for (let subcategory of subcategories) {
@@ -297,18 +333,29 @@ Sat.prototype.appendCascadeCategories = function(
   }
   child.selectedIndex = selectedIdx;
   categoryDiv.append(child);
+  cb.onclick = function(e) {
+    self._checkHandler();
+    if (self.currentItem.active) {
+      self.currentItem.redrawLabelCanvas();
+    }
+  };
+  categoryDiv.append(cb);  
   categoryDiv.append(document.createElement('hr')); // horizontal break
   // attach appropriate handler if not last level
   if (subcategories[selectedIdx].subcategories) {
     $('#parent_select_' + level).change(function() {
       let newSubcategories = self.categories;
+      let fatherName ="";
       for (let i = 0; i <= level; i++) {
         let idx = document.getElementById('parent_select_' + i).selectedIndex;
+        fatherName = newSubcategories[idx].name;
         newSubcategories = newSubcategories[idx].subcategories;
       }
+      document.getElementById('parent_visual_select_'+level).checked = self.categoriesVisualSelect[fatherName];
       // handles the edge case where leaf categories are not at same level
       if (!newSubcategories) { // this level becomes the category_select level
         let thisLevel = document.getElementById('parent_select_' + level);
+        $('#parent_select_' + level).next().remove();
         $('#parent_select_' + level).next().remove();
         let categorySelect = document.getElementById('category_select');
         categorySelect.innerHTML = thisLevel.innerHTML;
@@ -343,6 +390,21 @@ Sat.prototype.appendCascadeCategories = function(
       level + 1); // recursively add new levels
 };
 
+Sat.prototype._checkHandler = function() {
+  let self = this;
+  let level = 0;
+  while(document.getElementById('parent_select_'+level)){
+    let categorySelect = document.getElementById('parent_select_'+level);
+    let categoryCheckbox = document.getElementById('parent_visual_select_'+level);
+    if(categoryCheckbox.checked){
+      self.categoriesVisualSelect[categorySelect[categorySelect.selectedIndex].innerHTML] = true;
+    }
+    else{
+      self.categoriesVisualSelect[categorySelect[categorySelect.selectedIndex].innerHTML] = false;
+    }
+    level++;
+  }
+};
 Sat.prototype.initToolbox = function() {
   let self = this;
   // initialize all categories
@@ -822,6 +884,12 @@ SatLabel.prototype.encodeBaseJson = function() {
   }
   if (self.children && self.children.length > 0) {
     let childrenIds = [];
+    for (let i = 0; i < self.children.length; i++) {
+      if (self.children[i].valid) {
+        childrenIds.push(self.children[i].id);
+      }
+    }
+    json.childrenIds = childrenIds;
     for (let i = 0; i < self.children.length; i++) {
       if (self.children[i].valid) {
         childrenIds.push(self.children[i].id);
