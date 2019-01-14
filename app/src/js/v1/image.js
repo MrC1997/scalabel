@@ -150,7 +150,6 @@ SatImage.prototype.deleteLabel = function(label) {
 SatImage.prototype._selectLabel = function(label) {
   let self = this;
   if (this.selectedLabel) {
-    document.getElementById('trim-btn').disabled = true;
     this.selectedLabel.releaseAsTargeted();
     this._deselectAll();
   }
@@ -172,9 +171,11 @@ SatImage.prototype._selectLabel = function(label) {
         this._selectAttributeFromList(i, selectedIndex);
       }
     }
-    document.getElementById('trim-btn').disabled = false;
-    document.getElementById('trim-btn').onclick = function() {
-      self._trimHandler();
+    document.getElementById('inc-area-trim-btn').onclick = function() {
+      self._incAreaTrimHandler();
+    };
+    document.getElementById('dec-area-trim-btn').onclick = function() {
+      self._decAreaTrimHandler();
     };
     this.upadateToolbox(this.selectedLabel);
     this._setCatSel(this.selectedLabel.categoryPath);
@@ -594,17 +595,161 @@ SatImage.prototype._getSelectedAttributes = function() {
   return attributes;
 };
 /**
- *Trim button handle
+ *Increase aera trim button handler
  */
-SatImage.prototype._trimHandler = function() {
+SatImage.prototype._incAreaTrimHandler = function() {
   let self = this;
   if(self.selectedLabel){
-    let trimRatio = document.getElementById('trim-off=ratio').value;
+    let trimRatio = document.getElementById('trim-ratio').value;
+    let label = self.selectedLabel;
+    let h = label.h*(1+trimRatio/100);
+    let w = label.w*(1+trimRatio/100);
+    let x = label.x-w*trimRatio/200;
+    let y = label.y-h*trimRatio/200;
+    label.rect.setRect(x,y,w,h);
+    self.redrawLabelCanvas();
+  }
+};
+/**
+ *Decrease aera trim button handler
+ */
+SatImage.prototype._decAreaTrimHandler = function() {
+  let self = this;
+  if(self.selectedLabel){
+    let trimRatio = document.getElementById('trim-ratio').value;
     let label = self.selectedLabel;
     let h = label.h*(1-trimRatio/100);
     let w = label.w*(1-trimRatio/100);
     let x = label.x+w*trimRatio/200;
     let y = label.y+h*trimRatio/200;
+    label.rect.setRect(x,y,w,h);
+    self.redrawLabelCanvas();
+  }
+};
+/**
+ * Up trim button handler
+ */
+SatImage.prototype._upTrimHandler = function() {
+  let self = this;
+  if(self.selectedLabel){
+    let trimRatio = document.getElementById('trim-ratio').value;
+    let label = self.selectedLabel;
+    let x = label.x;
+    let y = label.y+label.h*trimRatio/200;
+    let w = label.w;
+    let h = label.h;
+    label.rect.setRect(x,y,w,h);
+    self.redrawLabelCanvas();
+  }
+};
+/**
+ * Down trim button handler
+ */
+SatImage.prototype._downTrimHandler = function() {
+  let self = this;
+  if(self.selectedLabel){
+    let trimRatio = document.getElementById('trim-ratio').value;
+    let label = self.selectedLabel;
+    let x = label.x;
+    let y = label.y-lable.h*trimRatio/200;
+    let w = label.w;
+    let h = label.h;
+    label.rect.setRect(x,y,w,h);
+    self.redrawLabelCanvas();
+  }
+};
+/**
+ * Left trim button handler
+ */
+SatImage.prototype._leftTrimHandler = function() {
+  let self = this;
+  if(self.selectedLabel){
+    let trimRatio = document.getElementById('trim-ratio').value;
+    let label = self.selectedLabel;
+    let x = label.x-label.w*trimRatio/200;
+    let y = label.y;
+    let w = label.w;
+    let h = label.h;
+    label.rect.setRect(x,y,w,h);
+    self.redrawLabelCanvas();
+  }
+};
+/**
+ * Right trim button handler
+ */
+SatImage.prototype._leftTrimHandler = function() {
+  let self = this;
+  if(self.selectedLabel){
+    let trimRatio = document.getElementById('trim-ratio').value;
+    let label = self.selectedLabel;
+    let x = label.x+label.w*trimRatio/200;
+    let y = label.y;
+    let w = label.w;
+    let h = label.h;
+    label.rect.setRect(x,y,w,h);
+    self.redrawLabelCanvas();
+  }
+};
+/**
+ * Increase height trim button handler
+ */
+SatImage.prototype._IncHeightTrimHandler = function() {
+  let self = this;
+  if(self.selectedLabel){
+    let trimRatio = document.getElementById('trim-ratio').value;
+    let label = self.selectedLabel;
+    let x = label.x;
+    let y = label.y;
+    let w = label.w;
+    let h = label.h+label.h*trimRatio/200;
+    label.rect.setRect(x,y,w,h);
+    self.redrawLabelCanvas();
+  }
+};
+/**
+ * Decrease height trim button handler
+ */
+SatImage.prototype._DecHeightTrimHandler = function() {
+  let self = this;
+  if(self.selectedLabel){
+    let trimRatio = document.getElementById('trim-ratio').value;
+    let label = self.selectedLabel;
+    let x = label.x;
+    let y = label.y;
+    let w = label.w;
+    let h = label.h-label.h*trimRatio/200;
+    label.rect.setRect(x,y,w,h);
+    self.redrawLabelCanvas();
+  }
+};
+/**
+ * Increase width trim button handler
+ */
+SatImage.prototype._IncWidthTrimHandler = function() {
+  let self = this;
+  if(self.selectedLabel){
+    let trimRatio = document.getElementById('trim-ratio').value;
+    let label = self.selectedLabel;
+    let x = label.x;
+    let y = label.y;
+    let w = label.w+label.w*trimRatio/200;
+    let h = label.h;
+    label.rect.setRect(x,y,w,h);
+    self.redrawLabelCanvas();
+  }
+};
+/**
+ * Decrease width trim button handler
+ */
+SatImage.prototype._DecWidthTrimHandler = function() {
+  let self = this;
+  if(self.selectedLabel){
+    let trimRatio = document.getElementById('trim-ratio').value;
+    let label = self.selectedLabel;
+    let x = label.x;
+    let y = label.y;
+    let w = label.w-label.w*trimRatio/200;
+    let h = label.h;
     label.rect.setRect(x,y,w,h);
     self.redrawLabelCanvas();
   }
@@ -839,7 +984,7 @@ SatImage.prototype._keydown = function(e) {
       if (this.sat.constructor.name === 'SatVideo') {
         this.sat.clickPlayPause();
       }
-    } else if (keyID === 46 || keyID === 8) { // Delete or Backspace
+    } else if (keyID === 46) { // Delete 'backespace have a conflict between textbox and labelcanvas'
       if (self.selectedLabel) {
         self.deleteLabel(self.selectedLabel);
         self.deselectAll();
@@ -1590,7 +1735,6 @@ ImageLabel.prototype.drawTag = function(ctx, position) {
   let self = this;
   if (self.shapesValid()) {
     ctx.save();
-    let tw = self.TAG_WIDTH;
     let abbr = "";
     for(let key in self.sat.table){
       if(self.categoryPath==self.sat.table[key][0]){
@@ -1605,7 +1749,7 @@ ImageLabel.prototype.drawTag = function(ctx, position) {
     let words = self.categoryPath.split(' ');
     // abbreviate tag as the first 3 chars of the last word
     abbr = words[words.length - 1].substring(0, 3)+abbr;
-    tw = abbr.length*7+10;
+    let tw = abbr.length*7+10;
     for (let i = 0; i < self.sat.attributes.length; i++) {
       let attribute = self.sat.attributes[i];
       if (attribute.toolType === 'switch') {
