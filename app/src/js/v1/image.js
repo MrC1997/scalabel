@@ -183,24 +183,29 @@ SatImage.prototype._selectLabel = function(label) {
     this.redrawHiddenCanvas();
   }
 };
-SatImage.prototype.upadateToolbox = function(label){
-  let category_absPath = [];
+SatImage.prototype.upadateToolbox = function(label) {
+  let categoryAbsPath = [];
   let table = this.sat.table;
-  for(let i = 0; i<table.length;i++){
-    if(table[i][0] == label.categoryPath){
-      category_absPath = table[i].concat();
-      this.findCategoryIndex(this.sat.categories,category_absPath.reverse(),0);
+  for (let i = 0; i<table.length; i++) {
+    if (table[i][0] == label.categoryPath) {
+      categoryAbsPath = table[i].concat();
+      this.findCategoryIndex(this.sat.categories, categoryAbsPath.reverse(), 0);
       break;
     }
   }
 };
-SatImage.prototype.findCategoryIndex = function(categories,categoryName,level){
-  for(let i = 0;i<categories.length;i++){
-    if(categoryName[0] == categories[i].name){
-      this.sat.appendCascadeCategories(categories,level,i);
+SatImage.prototype.findCategoryIndex
+    = function(categories, categoryName, level) {
+  for (let i = 0; i<categories.length; i++) {
+    if (categoryName[0] == categories[i].name) {
+      this.sat.appendCascadeCategories(categories, level, i);
       categoryName.shift();
-      if(categories[i].subcategories)
-        this.findCategoryIndex(categories[i].subcategories,categoryName,level+1);
+      if (categories[i].subcategories) {
+        this.findCategoryIndex(
+            categories[i].subcategories,
+            categoryName,
+            level+1);
+      }
       break;
     }
   }
@@ -599,14 +604,14 @@ SatImage.prototype._getSelectedAttributes = function() {
  */
 SatImage.prototype._incAreaTrimHandler = function() {
   let self = this;
-  if(self.selectedLabel){
+  if (self.selectedLabel) {
     let trimRatio = document.getElementById('trim-ratio').value;
     let label = self.selectedLabel;
     let h = label.h*(1+trimRatio/100);
     let w = label.w*(1+trimRatio/100);
     let x = label.x-w*trimRatio/200;
     let y = label.y-h*trimRatio/200;
-    label.rect.setRect(x,y,w,h);
+    label.rect.setRect(x, y, w, h);
     self.redrawLabelCanvas();
   }
 };
@@ -615,14 +620,14 @@ SatImage.prototype._incAreaTrimHandler = function() {
  */
 SatImage.prototype._decAreaTrimHandler = function() {
   let self = this;
-  if(self.selectedLabel){
+  if (self.selectedLabel) {
     let trimRatio = document.getElementById('trim-ratio').value;
     let label = self.selectedLabel;
     let h = label.h*(1-trimRatio/100);
     let w = label.w*(1-trimRatio/100);
     let x = label.x+w*trimRatio/200;
     let y = label.y+h*trimRatio/200;
-    label.rect.setRect(x,y,w,h);
+    label.rect.setRect(x, y, w, h);
     self.redrawLabelCanvas();
   }
 };
@@ -631,14 +636,14 @@ SatImage.prototype._decAreaTrimHandler = function() {
  */
 SatImage.prototype._upTrimHandler = function() {
   let self = this;
-  if(self.selectedLabel){
+  if (self.selectedLabel) {
     let trimRatio = document.getElementById('trim-ratio').value;
     let label = self.selectedLabel;
     let x = label.x;
     let y = label.y+label.h*trimRatio/200;
     let w = label.w;
     let h = label.h;
-    label.rect.setRect(x,y,w,h);
+    label.rect.setRect(x, y, w, h);
     self.redrawLabelCanvas();
   }
 };
@@ -647,14 +652,14 @@ SatImage.prototype._upTrimHandler = function() {
  */
 SatImage.prototype._downTrimHandler = function() {
   let self = this;
-  if(self.selectedLabel){
+  if (self.selectedLabel) {
     let trimRatio = document.getElementById('trim-ratio').value;
     let label = self.selectedLabel;
     let x = label.x;
-    let y = label.y-lable.h*trimRatio/200;
+    let y = label.y-label.h*trimRatio/200;
     let w = label.w;
     let h = label.h;
-    label.rect.setRect(x,y,w,h);
+    label.rect.setRect(x, y, w, h);
     self.redrawLabelCanvas();
   }
 };
@@ -663,14 +668,14 @@ SatImage.prototype._downTrimHandler = function() {
  */
 SatImage.prototype._leftTrimHandler = function() {
   let self = this;
-  if(self.selectedLabel){
+  if (self.selectedLabel) {
     let trimRatio = document.getElementById('trim-ratio').value;
     let label = self.selectedLabel;
     let x = label.x-label.w*trimRatio/200;
     let y = label.y;
     let w = label.w;
     let h = label.h;
-    label.rect.setRect(x,y,w,h);
+    label.rect.setRect(x, y, w, h);
     self.redrawLabelCanvas();
   }
 };
@@ -679,14 +684,14 @@ SatImage.prototype._leftTrimHandler = function() {
  */
 SatImage.prototype._leftTrimHandler = function() {
   let self = this;
-  if(self.selectedLabel){
+  if (self.selectedLabel) {
     let trimRatio = document.getElementById('trim-ratio').value;
     let label = self.selectedLabel;
     let x = label.x+label.w*trimRatio/200;
     let y = label.y;
     let w = label.w;
     let h = label.h;
-    label.rect.setRect(x,y,w,h);
+    label.rect.setRect(x, y, w, h);
     self.redrawLabelCanvas();
   }
 };
@@ -695,14 +700,14 @@ SatImage.prototype._leftTrimHandler = function() {
  */
 SatImage.prototype._IncHeightTrimHandler = function() {
   let self = this;
-  if(self.selectedLabel){
+  if (self.selectedLabel) {
     let trimRatio = document.getElementById('trim-ratio').value;
     let label = self.selectedLabel;
     let x = label.x;
     let y = label.y;
     let w = label.w;
     let h = label.h+label.h*trimRatio/200;
-    label.rect.setRect(x,y,w,h);
+    label.rect.setRect(x, y, w, h);
     self.redrawLabelCanvas();
   }
 };
@@ -711,14 +716,14 @@ SatImage.prototype._IncHeightTrimHandler = function() {
  */
 SatImage.prototype._DecHeightTrimHandler = function() {
   let self = this;
-  if(self.selectedLabel){
+  if (self.selectedLabel) {
     let trimRatio = document.getElementById('trim-ratio').value;
     let label = self.selectedLabel;
     let x = label.x;
     let y = label.y;
     let w = label.w;
     let h = label.h-label.h*trimRatio/200;
-    label.rect.setRect(x,y,w,h);
+    label.rect.setRect(x, y, w, h);
     self.redrawLabelCanvas();
   }
 };
@@ -727,14 +732,14 @@ SatImage.prototype._DecHeightTrimHandler = function() {
  */
 SatImage.prototype._IncWidthTrimHandler = function() {
   let self = this;
-  if(self.selectedLabel){
+  if (self.selectedLabel) {
     let trimRatio = document.getElementById('trim-ratio').value;
     let label = self.selectedLabel;
     let x = label.x;
     let y = label.y;
     let w = label.w+label.w*trimRatio/200;
     let h = label.h;
-    label.rect.setRect(x,y,w,h);
+    label.rect.setRect(x, y, w, h);
     self.redrawLabelCanvas();
   }
 };
@@ -743,14 +748,14 @@ SatImage.prototype._IncWidthTrimHandler = function() {
  */
 SatImage.prototype._DecWidthTrimHandler = function() {
   let self = this;
-  if(self.selectedLabel){
+  if (self.selectedLabel) {
     let trimRatio = document.getElementById('trim-ratio').value;
     let label = self.selectedLabel;
     let x = label.x;
     let y = label.y;
     let w = label.w-label.w*trimRatio/200;
     let h = label.h;
-    label.rect.setRect(x,y,w,h);
+    label.rect.setRect(x, y, w, h);
     self.redrawLabelCanvas();
   }
 };
@@ -984,7 +989,7 @@ SatImage.prototype._keydown = function(e) {
       if (this.sat.constructor.name === 'SatVideo') {
         this.sat.clickPlayPause();
       }
-    } else if (keyID === 46) { // Delete 'backespace have a conflict between textbox and labelcanvas'
+    } else if (keyID === 46) { // Delete
       if (self.selectedLabel) {
         self.deleteLabel(self.selectedLabel);
         self.deselectAll();
@@ -1735,13 +1740,14 @@ ImageLabel.prototype.drawTag = function(ctx, position) {
   let self = this;
   if (self.shapesValid()) {
     ctx.save();
-    let abbr = "";
-    for(let key in self.sat.table){
-      if(self.categoryPath==self.sat.table[key][0]){
+    let abbr = '';
+    for (let key in self.sat.table) {
+      if (self.categoryPath==self.sat.table[key][0]) {
         let absPath = self.sat.table[key];
-        for(let i in absPath){
-          if(self.sat.categoriesVisualSelect[absPath[i]])
+        for (let i in absPath) {
+          if (self.sat.categoriesVisualSelect[absPath[i]]) {
             abbr = abbr +'.'+ absPath[i];
+          }
         }
         break;
       }

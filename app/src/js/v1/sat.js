@@ -93,7 +93,7 @@ export function Sat(ItemType, LabelType, hasNetwork=true) {
   }
   if (hasNetwork) {
     self.load();
-    self.solvetree(self.categories,[],0);
+    self.solvetree(self.categories, [], 0);
     self.getIpInfo();
   }
   self.state = makeState();
@@ -222,18 +222,20 @@ Sat.prototype.loaded = function() {
   this.currentItem.setActive(true);
 };
 
-Sat.prototype.solvetree = function(subcategories,fatherName,bidx){  //node ,this node`s name ,the number of bidx
+Sat.prototype.solvetree = function(subcategories, fatherName, bidx) {
+// node ,this node`s name ,the number of bidx
   let self = this;
-  for(let key in subcategories){ //traverse this level 
-    if(!subcategories[key].subcategories) { //if next level not exists 
+  for (let key in subcategories) { // traverse this level
+    if (!subcategories[key].subcategories) { // if next level not exists
       self.table[bidx] = fatherName.concat();
-      self.table[bidx].unshift(subcategories[key].name);//push a child name
+      self.table[bidx].unshift(subcategories[key].name);// push a child name
       self.table.push([]);
       bidx++;
-    }else {
-      self.categoriesVisualSelect [subcategories[key].name] = false;  //build a categories display selector
+    } else {
+      // build a categories display selector
+      self.categoriesVisualSelect [subcategories[key].name] = false;
       fatherName.unshift(subcategories[key].name);
-      bidx = this.solvetree(subcategories[key].subcategories,fatherName,bidx);
+      bidx = this.solvetree(subcategories[key].subcategories, fatherName, bidx);
       fatherName.shift();
     }
   }
@@ -290,7 +292,7 @@ Sat.prototype.appendCascadeCategories = function(
   let categoryDiv = document.getElementById('custom_categories');
   // build new category select window
   let child;
-  //build new category visual selector checkbox
+  // build new category visual selector checkbox
   let cb;
   // if there is subcategory, this node is parent node, grow tree
   if (subcategories[selectedIdx].subcategories) {
@@ -300,10 +302,10 @@ Sat.prototype.appendCascadeCategories = function(
     child.size = Math.min(10, subcategories.length);
     child.style = 'font-size:15px';
     cb = document.createElement('input');
-    cb.id = "parent_visual_select_"+level;
+    cb.id = 'parent_visual_select_'+level;
     cb.type = 'checkbox';
     cb.checked = this.categoriesVisualSelect[subcategories[selectedIdx].name];
-    cb.name = "checkbox";
+    cb.name = 'checkbox';
   } else {
     // this node is leaf, clean up old options
     let oldCategorySelect = document.getElementById('category_select');
@@ -319,7 +321,7 @@ Sat.prototype.appendCascadeCategories = function(
       child.style = 'font-size:15px';
     }
     cb = document.createElement('input');
-    cb.id = "category_visual_select";
+    cb.id = 'category_visual_select';
     cb.type = 'checkbox';
     cb.checked = true;
     cb.disabled = true;
@@ -333,25 +335,26 @@ Sat.prototype.appendCascadeCategories = function(
   }
   child.selectedIndex = selectedIdx;
   categoryDiv.append(child);
-  cb.onclick = function(e) {
+  cb.onclick = function() {
     self._checkHandler();
     if (self.currentItem.active) {
       self.currentItem.redrawLabelCanvas();
     }
   };
-  categoryDiv.append(cb);  
+  categoryDiv.append(cb);
   categoryDiv.append(document.createElement('hr')); // horizontal break
   // attach appropriate handler if not last level
   if (subcategories[selectedIdx].subcategories) {
     $('#parent_select_' + level).change(function() {
       let newSubcategories = self.categories;
-      let fatherName ="";
+      let fatherName ='';
       for (let i = 0; i <= level; i++) {
         let idx = document.getElementById('parent_select_' + i).selectedIndex;
         fatherName = newSubcategories[idx].name;
         newSubcategories = newSubcategories[idx].subcategories;
       }
-      document.getElementById('parent_visual_select_'+level).checked = self.categoriesVisualSelect[fatherName];
+      document.getElementById('parent_visual_select_'+level).checked
+            = self.categoriesVisualSelect[fatherName];
       // handles the edge case where leaf categories are not at same level
       if (!newSubcategories) { // this level becomes the category_select level
         let thisLevel = document.getElementById('parent_select_' + level);
@@ -393,14 +396,17 @@ Sat.prototype.appendCascadeCategories = function(
 Sat.prototype._checkHandler = function() {
   let self = this;
   let level = 0;
-  while(document.getElementById('parent_select_'+level)){
+  while (document.getElementById('parent_select_'+level)) {
     let categorySelect = document.getElementById('parent_select_'+level);
-    let categoryCheckbox = document.getElementById('parent_visual_select_'+level);
-    if(categoryCheckbox.checked){
-      self.categoriesVisualSelect[categorySelect[categorySelect.selectedIndex].innerHTML] = true;
-    }
-    else{
-      self.categoriesVisualSelect[categorySelect[categorySelect.selectedIndex].innerHTML] = false;
+    let selectedIndex = categorySelect.selectedIndex;
+    let categoryCheckbox =
+          document.getElementById('parent_visual_select_'+level);
+    if (categoryCheckbox.checked) {
+      self.categoriesVisualSelect[categorySelect[selectedIndex].innerHTML]
+            = true;
+    } else {
+      self.categoriesVisualSelect[categorySelect[selectedIndex].innerHTML]
+            = false;
     }
     level++;
   }
